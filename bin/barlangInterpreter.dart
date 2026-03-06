@@ -20,7 +20,12 @@ List<Map<String, int>> activeLoops = [];
 void main(List<String> args) {
 
   if (args.isEmpty) {
-    print("Fuck you");
+    print("[EmptyFile Error] Fuck you");
+    return;
+  }
+
+  if (!args[0].toLowerCase().endsWith(".bar")) {
+    print("[FileType Error] Outside liquor not allowed! Please provide a .bar file :3");
     return;
   }
 
@@ -53,7 +58,7 @@ void main(List<String> args) {
 
     int? jump = interpret(leftBar, midSpace, rightBar, lineIndex);
     if (jump != null) {
-      lineIndex = jump;
+      lineIndex = jump-1;
     }
   }
 }
