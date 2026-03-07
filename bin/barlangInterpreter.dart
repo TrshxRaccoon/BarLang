@@ -58,7 +58,7 @@ void main(List<String> args) {
 
     int? jump = interpret(leftBar, midSpace, rightBar, lineIndex);
     if (jump != null) {
-      lineIndex = jump-1;
+      lineIndex = jump;
     }
   }
 }
