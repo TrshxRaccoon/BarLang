@@ -3,14 +3,16 @@
 * | -> create var
 * || -> set var
 * ||| -> print var
-* |||| -> add to var an int
-* ||||| -> dec from var an int
-* |||||| -> mul to var an int
-* ||||||| -> div from var an int
+* |||| -> copy value from var[rightBars] into var[spaces]
+* ||||| -> add to var an int
+* |||||| -> dec from var an int
+* ||||||| -> mul to var an int
+* |||||||| -> div from var an int
 * for loops:
-* |||||||| -> loop start
-* ||||||||| -> loop end
-* FUCK I FORGOT READ FROM VAR (POSSIBLY ||||)
+* ||||||||| -> loop start
+* |||||||||| -> loop end
+* ||||||||||| -> if var == 0 jump forward N lines
+* |||||||||||| -> print ASCII character from var
 */
 
 import 'dart:io';
@@ -18,14 +20,15 @@ import 'dart:io';
 Map<int, int> vars = {};
 List<Map<String, int>> activeLoops = [];
 void main(List<String> args) {
-
   if (args.isEmpty) {
     print("[EmptyFile Error] Fuck you");
     return;
   }
 
   if (!args[0].toLowerCase().endsWith(".bar")) {
-    print("[FileType Error] Outside liquor not allowed! Please provide a .bar file :3");
+    print(
+      "[FileType Error] Outside liquor not allowed! Please provide a .bar file :3",
+    );
     return;
   }
 
@@ -63,10 +66,13 @@ void main(List<String> args) {
   }
 }
 
-int? interpret(int instructionSet, int variableValue, int setValue, int lineIndex) {
-
-  switch(instructionSet) {
-
+int? interpret(
+  int instructionSet,
+  int variableValue,
+  int setValue,
+  int lineIndex,
+) {
+  switch (instructionSet) {
     case 1: // create var
       vars[variableValue] = 0;
       break;
@@ -79,32 +85,35 @@ int? interpret(int instructionSet, int variableValue, int setValue, int lineInde
       print(vars[variableValue] ?? 0);
       break;
 
-    case 4: // add int to var
+    case 4: // copy value from var[setValue] into var[variableValue]
+      vars[variableValue] = vars[setValue] ?? 0;
+      break;
+
+    case 5: // add int to var
       vars[variableValue] = (vars[variableValue] ?? 0) + setValue;
       break;
 
-    case 5: // subtract int from var
+    case 6: // subtract int from var
       vars[variableValue] = (vars[variableValue] ?? 0) - setValue;
       break;
 
-    case 6: // multiply int to var
+    case 7: // multiply int to var
       vars[variableValue] = (vars[variableValue] ?? 0) * setValue;
       break;
 
-    case 7: // divide int from var
+    case 8: // divide int from var
       if (setValue != 0) {
         vars[variableValue] = (vars[variableValue] ?? 0) ~/ setValue;
       }
       break;
 
-    case 8: // loop start till var > 0
-      activeLoops.add({
-        "line": lineIndex,
-        "var": variableValue
-      });
+    case 9:
+      if (activeLoops.isEmpty || activeLoops.last["line"] != lineIndex) {
+        activeLoops.add({"line": lineIndex, "var": variableValue});
+      }
       break;
 
-    case 9: // loop end
+    case 10: // loop end
       if (activeLoops.isNotEmpty) {
         var loop = activeLoops.last;
         int loopVar = loop["var"]!;
@@ -118,12 +127,16 @@ int? interpret(int instructionSet, int variableValue, int setValue, int lineInde
       }
       break;
 
-    case 10: // if var == 0 jump forward N lines
+    case 11: // if var == 0 jump forward N lines
       if ((vars[variableValue] ?? 0) == 0) {
         return lineIndex + setValue;
       }
       break;
 
+    case 12: // print ASCII character from var
+      int value = vars[variableValue] ?? 0;
+      stdout.write(String.fromCharCode(value));
+      break;
   }
   return null;
 }
